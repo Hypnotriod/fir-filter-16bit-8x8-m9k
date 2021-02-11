@@ -98,37 +98,35 @@ always @(posedge clkIn or negedge nResetIn) begin
 		buffWren <= 0;
 		memoryDelay <= 0;
 	end
-	else begin
-		if(startIn && !busy) begin
-			busy <= 1;
-			buffWren <= 1;
-			memoryDelay <= 1;
-			accumulator <= 0;
-			buffShifter <= {dataIn, buffWord};
-			firReg <= firWord;
-		end
-		else if (buffWren) begin
-			buffWren <= 0;
-			wordIndex <= wordIndex + 1;
-		end
-		else if (memoryDelay) begin
-			memoryDelay <= 0;
-		end
-		else if(wordIndex != 0) begin
-			buffWren <= 1;
-			memoryDelay <= 1;
-			accumulator <= parallelAddResult + accumulator;
-			buffShifter <= {buffShifter[SAMPLE_WIDTH - 1:0], buffWord};
-			firReg <= firWord;
-		end
-		else if(busy) begin
-			accumulator <= parallelAddResult + accumulator;
-			busy <= 0;
-			done <= 1;
-		end
-		else if(done == 1) begin
-			done <= 0;
-		end
+	else if(startIn && !busy) begin
+		busy <= 1;
+		buffWren <= 1;
+		memoryDelay <= 1;
+		accumulator <= 0;
+		buffShifter <= {dataIn, buffWord};
+		firReg <= firWord;
+	end
+	else if (buffWren) begin
+		buffWren <= 0;
+		wordIndex <= wordIndex + 1;
+	end
+	else if (memoryDelay) begin
+		memoryDelay <= 0;
+	end
+	else if(wordIndex != 0) begin
+		buffWren <= 1;
+		memoryDelay <= 1;
+		accumulator <= parallelAddResult + accumulator;
+		buffShifter <= {buffShifter[SAMPLE_WIDTH - 1:0], buffWord};
+		firReg <= firWord;
+	end
+	else if(busy) begin
+		accumulator <= parallelAddResult + accumulator;
+		busy <= 0;
+		done <= 1;
+	end
+	else if(done == 1) begin
+		done <= 0;
 	end
 end
 
