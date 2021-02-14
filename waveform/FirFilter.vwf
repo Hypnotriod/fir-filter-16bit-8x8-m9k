@@ -1,14 +1,14 @@
 /*<simulation_settings>
-<ftestbench_cmd>quartus_eda --gen_testbench --tool=modelsim_oem --format=verilog --write_settings_files=off EP4CE6E22C8N_FIR -c EP4CE6E22C8N_FIR --vector_source="./waveform/FirFilter.vwf" --testbench_file="./simulation/qsim/FirFilter.vwf.vt"</ftestbench_cmd>
-<ttestbench_cmd>quartus_eda --gen_testbench --tool=modelsim_oem --format=verilog --write_settings_files=off EP4CE6E22C8N_FIR -c EP4CE6E22C8N_FIR --vector_source="./waveform/FirFilter.vwf" --testbench_file="./simulation/qsim/FirFilter.vwf.vt"</ttestbench_cmd>
-<fnetlist_cmd>quartus_eda --write_settings_files=off --simulation --functional=on --flatten_buses=off --tool=modelsim_oem --format=verilog --output_directory="./simulation/qsim/" EP4CE6E22C8N_FIR -c EP4CE6E22C8N_FIR</fnetlist_cmd>
-<tnetlist_cmd>quartus_eda --write_settings_files=off --simulation --functional=off --flatten_buses=off --timescale=1ps --tool=modelsim_oem --format=verilog --output_directory="./simulation/qsim/" EP4CE6E22C8N_FIR -c EP4CE6E22C8N_FIR</tnetlist_cmd>
+<ftestbench_cmd>quartus_eda --gen_testbench --tool=modelsim_oem --format=verilog --write_settings_files=off fir-filter-16bit-8x8-m9k -c fir-filter-16bit-8x8-m9k --vector_source="./waveform/FirFilter.vwf" --testbench_file="./simulation/qsim/FirFilter.vwf.vt"</ftestbench_cmd>
+<ttestbench_cmd>quartus_eda --gen_testbench --tool=modelsim_oem --format=verilog --write_settings_files=off fir-filter-16bit-8x8-m9k -c fir-filter-16bit-8x8-m9k --vector_source="./waveform/FirFilter.vwf" --testbench_file="./simulation/qsim/FirFilter.vwf.vt"</ttestbench_cmd>
+<fnetlist_cmd>quartus_eda --write_settings_files=off --simulation --functional=on --flatten_buses=off --tool=modelsim_oem --format=verilog --output_directory="./simulation/qsim/" fir-filter-16bit-8x8-m9k -c fir-filter-16bit-8x8-m9k</fnetlist_cmd>
+<tnetlist_cmd>quartus_eda --write_settings_files=off --simulation --functional=off --flatten_buses=off --timescale=1ps --tool=modelsim_oem --format=verilog --output_directory="./simulation/qsim/" fir-filter-16bit-8x8-m9k -c fir-filter-16bit-8x8-m9k</tnetlist_cmd>
 <modelsim_script>onerror {exit -code 1}
 vlib work
-vlog -work work EP4CE6E22C8N_FIR.vo
+vlog -work work fir-filter-16bit-8x8-m9k.vo
 vlog -work work FirFilter.vwf.vt
 vsim -c -t 1ps -L cycloneive_ver -L altera_ver -L altera_mf_ver -L 220model_ver -L sgate_ver -L altera_lnsim_ver work.FirFilter_vlg_vec_tst
-vcd file -direction EP4CE6E22C8N_FIR.msim.vcd
+vcd file -direction fir-filter-16bit-8x8-m9k.msim.vcd
 vcd add -internal FirFilter_vlg_vec_tst/*
 vcd add -internal FirFilter_vlg_vec_tst/i1/*
 proc simTimestamp {} {
@@ -24,10 +24,10 @@ quit -f
 </modelsim_script>
 <modelsim_script_timing>onerror {exit -code 1}
 vlib work
-vlog -work work EP4CE6E22C8N_FIR.vo
+vlog -work work fir-filter-16bit-8x8-m9k.vo
 vlog -work work FirFilter.vwf.vt
 vsim -c -t 1ps -L cycloneive_ver -L altera_ver -L altera_mf_ver -L 220model_ver -L sgate_ver -L altera_lnsim_ver work.FirFilter_vlg_vec_tst
-vcd file -direction EP4CE6E22C8N_FIR.msim.vcd
+vcd file -direction fir-filter-16bit-8x8-m9k.msim.vcd
 vcd add -internal FirFilter_vlg_vec_tst/*
 vcd add -internal FirFilter_vlg_vec_tst/i1/*
 proc simTimestamp {} {
