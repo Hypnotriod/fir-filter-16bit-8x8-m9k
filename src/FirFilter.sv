@@ -1,11 +1,14 @@
 
 /*
-* FirFilter.v
+* FirFilter.sv
 *
 *  Author: Ilya Pikin
 */
 
 module FirFilter
+# (
+	parameter SAMPLES_NUM = 4
+)
 (
 	input clkIn,
 	input nResetIn,
@@ -17,7 +20,6 @@ module FirFilter
 );
 
 localparam SAMPLE_WIDTH = 16;
-localparam SAMPLES_NUM = 4;
 localparam WORD_WIDTH = 128;
 localparam WORDS_NUM = 1024;
 localparam TOTAL_WIDTH = WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM;
