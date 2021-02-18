@@ -80,8 +80,8 @@ always @(posedge clkIn or negedge nResetIn) begin
 		end
 	end
 	else begin
-		empty <= 0;
 		dataReceived <= 0;
+		empty <= 0;
 	end
 end
 
