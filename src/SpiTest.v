@@ -5,7 +5,7 @@
 *  Author: Ilya Pikin
 */
 
-module Main
+module SpiTest
 (
 	input clkIn,
 	input nResetIn,
@@ -16,21 +16,16 @@ module Main
 );
 
 localparam PACKET_SIZE = 8;
-localparam SAMPLES_NUM = 2;
 localparam BYTE_SIZE = 8;
-localparam SAMPLE_WIDTH = 16;
 
-wire dataReceived;
-wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataRaw;
-wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataComputed;
-
-wire [SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataLoad = {
-	dataRaw[SAMPLE_WIDTH * 3 - 1:SAMPLE_WIDTH * 2], 
-	dataRaw[SAMPLE_WIDTH * 4 - 1:SAMPLE_WIDTH * 3]};
-	
 wire ss;
 wire mosi;
 wire sck;
+
+wire dataReceived;
+
+wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataRx;
+reg [BYTE_SIZE * PACKET_SIZE - 1:0] dataTx;
 
 RXMajority3Filter ssFilter(.clkIn(clkIn), .nResetIn(nResetIn), .in(ssIn), .out(ss));
 RXMajority3Filter mosiFilter(.clkIn(clkIn), .nResetIn(nResetIn), .in(mosiIn), .out(mosi));
@@ -42,22 +37,21 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
 	.ssIn(ss),
 	.mosiIn(mosi),
 	.sckIn(sck),
-	.dataIn(dataComputed),
-	.dataOut(dataRaw),
+	.dataIn(dataTx),
+	.dataOut(dataRx),
 	.misoOut(misoOut),
 	.dataReceivedOut(dataReceived)
 	//.emptyOut(),
 	//.busyOut()
 );
 
-FirFilter #(.SAMPLES_NUM(SAMPLES_NUM)) firFilter(
-	.clkIn(clkIn),
-	.nResetIn(nResetIn),
-	.startIn(dataReceived),
-	.dataIn(dataLoad),
-	//.doneOut(),
-	//.busyOut(),
-	.dataOut(dataComputed)
-);
+always @(posedge clkIn or negedge nResetIn) begin
+	if (!nResetIn) begin
+		dataTx = 0;
+	end
+	else if (dataReceived) begin
+		dataTx <= dataRx;
+	end
+end
 
 endmodule
