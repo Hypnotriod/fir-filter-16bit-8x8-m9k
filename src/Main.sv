@@ -27,17 +27,23 @@ wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataComputed;
 wire [SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataLoad = {
 	dataRaw[SAMPLE_WIDTH * 3 - 1:SAMPLE_WIDTH * 2], 
 	dataRaw[SAMPLE_WIDTH * 4 - 1:SAMPLE_WIDTH * 3]};
-	
+
+wire clk;
 wire ss;
 wire mosi;
 wire sck;
 
-RXMajority3Filter ssFilter(.clkIn(clkIn), .nResetIn(nResetIn), .in(ssIn), .out(ss));
-RXMajority3Filter mosiFilter(.clkIn(clkIn), .nResetIn(nResetIn), .in(mosiIn), .out(mosi));
-RXMajority3Filter sckFilter(.clkIn(clkIn), .nResetIn(nResetIn), .in(sckIn), .out(sck));
+RXMajority3Filter ssFilter(.clkIn(clk), .nResetIn(nResetIn), .in(ssIn), .out(ss));
+RXMajority3Filter mosiFilter(.clkIn(clk), .nResetIn(nResetIn), .in(mosiIn), .out(mosi));
+RXMajority3Filter sckFilter(.clkIn(clk), .nResetIn(nResetIn), .in(sckIn), .out(sck));
+
+Pll100MHz pll100MHz(
+	.inclk0(clkIn),
+	.c0(clk)
+);
 
 SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
-	.clkIn(clkIn),
+	.clkIn(clk),
 	.nResetIn(nResetIn),
 	.ssIn(ss),
 	.mosiIn(mosi),
@@ -51,7 +57,7 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
 );
 
 FirFilter #(.SAMPLES_NUM(SAMPLES_NUM)) firFilter(
-	.clkIn(clkIn),
+	.clkIn(clk),
 	.nResetIn(nResetIn),
 	.startIn(dataReceived),
 	.dataIn(dataLoad),
