@@ -20,6 +20,8 @@ localparam SAMPLES_NUM = 2;
 localparam BYTE_SIZE = 8;
 localparam SAMPLE_WIDTH = 16;
 
+reg [BYTE_SIZE * PACKET_SIZE * 2 - 1:0] dataBuff;
+
 wire dataReceived;
 wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataRaw;
 wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataComputed;
@@ -33,6 +35,8 @@ wire ss;
 wire mosi;
 wire sck;
 
+wire computationComplete;
+
 RXMajority3Filter ssFilter(.clkIn(clk), .nResetIn(nResetIn), .in(ssIn), .out(ss));
 RXMajority3Filter mosiFilter(.clkIn(clk), .nResetIn(nResetIn), .in(mosiIn), .out(mosi));
 RXMajority3Filter sckFilter(.clkIn(clk), .nResetIn(nResetIn), .in(sckIn), .out(sck));
@@ -43,12 +47,12 @@ Pll100MHz pll100MHz(
 );
 
 SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
-	.clkIn(clk),
+	.clkIn(~clk),
 	.nResetIn(nResetIn),
 	.ssIn(ss),
 	.mosiIn(mosi),
 	.sckIn(sck),
-	.dataIn(dataComputed),
+	.dataIn(dataBuff[BYTE_SIZE * PACKET_SIZE * 2 - 1:BYTE_SIZE * PACKET_SIZE]),
 	.dataOut(dataRaw),
 	.misoOut(misoOut),
 	.dataReceivedOut(dataReceived)
@@ -61,9 +65,23 @@ FirFilter #(.SAMPLES_NUM(SAMPLES_NUM)) firFilter(
 	.nResetIn(nResetIn),
 	.startIn(dataReceived),
 	.dataIn(dataLoad),
-	//.doneOut(),
+	.doneOut(computationComplete),
 	//.busyOut(),
 	.dataOut(dataComputed)
 );
+
+always @(posedge clk or negedge nResetIn) begin
+	if (!nResetIn) begin
+		dataBuff <= 0;
+	end
+	else begin
+		if (computationComplete) begin
+			dataBuff[BYTE_SIZE * PACKET_SIZE - 1:0] <= dataComputed;
+		end
+		if (dataReceived) begin
+			dataBuff[BYTE_SIZE * PACKET_SIZE * 2 - 1:BYTE_SIZE * PACKET_SIZE] <= dataBuff[BYTE_SIZE * PACKET_SIZE - 1:0];
+		end
+	end
+end
 
 endmodule
