@@ -27,7 +27,7 @@ localparam TOTAL_WIDTH = WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM;
 reg [WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM - 1:0] buffShifter;
 reg [WORD_WIDTH - 1:0] firReg;
 reg [$clog2(WORDS_NUM) - 1:0] wordIndex;
-reg [35:0] accumulator[SAMPLES_NUM];
+reg [33:0] accumulator[SAMPLES_NUM];
 reg buffWren;
 reg memoryDelay;
 reg busy;
@@ -37,7 +37,7 @@ wire [TOTAL_WIDTH - 1:0] buffDataLoad;
 wire [TOTAL_WIDTH - 1:0] buffDataShift;
 wire [33:0] multAddResult1[SAMPLES_NUM];
 wire [33:0] multAddResult2[SAMPLES_NUM];
-wire [35:0] parallelAddResult[SAMPLES_NUM];
+wire [33:0] parallelAddResult[SAMPLES_NUM];
 wire [WORD_WIDTH - 1:0] firWord;
 wire [WORD_WIDTH - 1:0] buffWord;
 
@@ -62,6 +62,16 @@ RAM1 buffStorage (
 	.data(buffShifter[TOTAL_WIDTH - 1:SAMPLE_WIDTH * SAMPLES_NUM]),
 	.q(buffWord)
 );
+
+function [31:0] normalize ([33:0] value);
+	begin
+		case ({value[33], value[32], value[31]})
+			3'b100, 3'b101, 3'b110: normalize = 32'h80000000;
+			3'b011, 3'b001, 3'b010: normalize = 32'h7FFFFFFF;
+			default: normalize = value[31:0];
+		endcase
+	end
+endfunction
 
 generate
     for (i = 0; i < SAMPLES_NUM; i = i + 1) begin : accumulators_generation
@@ -99,26 +109,26 @@ generate
 	);
 end 
 case (SAMPLES_NUM)
-	1 : assign dataOut = {accumulator[0][35], accumulator[0][30:0]};
-	2 : assign dataOut = {accumulator[0][35], accumulator[0][30:0], accumulator[1][35], accumulator[1][30:0]};
-	3 : assign dataOut = {accumulator[0][35], accumulator[0][30:0], accumulator[1][35], accumulator[1][30:0],
-								 accumulator[2][35], accumulator[2][30:0]};
-	4 : assign dataOut = {accumulator[0][35], accumulator[0][30:0], accumulator[1][35], accumulator[1][30:0],
-								 accumulator[2][35], accumulator[2][30:0], accumulator[3][35], accumulator[3][30:0]};
-	5 : assign dataOut = {accumulator[0][35], accumulator[0][30:0], accumulator[1][35], accumulator[1][30:0],
-								 accumulator[2][35], accumulator[2][30:0], accumulator[3][35], accumulator[3][30:0],
-								 accumulator[4][35], accumulator[4][30:0]};
-	6 : assign dataOut = {accumulator[0][35], accumulator[0][30:0], accumulator[1][35], accumulator[1][30:0],
-								 accumulator[2][35], accumulator[2][30:0], accumulator[3][35], accumulator[3][30:0],
-								 accumulator[4][35], accumulator[4][30:0], accumulator[5][35], accumulator[5][30:0]};
-	7 : assign dataOut = {accumulator[0][35], accumulator[0][30:0], accumulator[1][35], accumulator[1][30:0],
-								 accumulator[2][35], accumulator[2][30:0], accumulator[3][35], accumulator[3][30:0],
-								 accumulator[4][35], accumulator[4][30:0], accumulator[5][35], accumulator[5][30:0],
-								 accumulator[6][35], accumulator[6][30:0]};
-	8 : assign dataOut = {accumulator[0][35], accumulator[0][30:0], accumulator[1][35], accumulator[1][30:0],
-								 accumulator[2][35], accumulator[2][30:0], accumulator[3][35], accumulator[3][30:0],
-								 accumulator[4][35], accumulator[4][30:0], accumulator[5][35], accumulator[5][30:0],
-								 accumulator[6][35], accumulator[6][30:0], accumulator[7][35], accumulator[7][30:0]};
+	1 : assign dataOut = {normalize(accumulator[0])};
+	2 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1])};
+	3 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
+								 normalize(accumulator[2])};
+	4 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
+								 normalize(accumulator[2]), normalize(accumulator[3])};
+	5 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
+								 normalize(accumulator[2]), normalize(accumulator[3]),
+								 normalize(accumulator[4])};
+	6 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
+								 normalize(accumulator[2]), normalize(accumulator[3]),
+								 normalize(accumulator[4]), normalize(accumulator[5])};
+	7 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
+								 normalize(accumulator[2]), normalize(accumulator[3]),
+								 normalize(accumulator[4]), normalize(accumulator[5]),
+								 normalize(accumulator[6])};
+	8 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
+								 normalize(accumulator[2]), normalize(accumulator[3]),
+								 normalize(accumulator[4]), normalize(accumulator[5]),
+								 normalize(accumulator[6]), normalize(accumulator[7])};
 endcase
 endgenerate
 

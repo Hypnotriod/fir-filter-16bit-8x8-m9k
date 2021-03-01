@@ -64,9 +64,6 @@ set_location_assignment PIN_104 -to sckIn
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sckIn
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ssIn
 set_location_assignment PIN_103 -to ssIn
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_global_assignment -name SYSTEMVERILOG_FILE src/RXMajority3Filter.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/Main.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/SpiSlave.sv
@@ -75,9 +72,12 @@ set_global_assignment -name QIP_FILE src/MultAdd.qip
 set_global_assignment -name QIP_FILE src/ROM1.qip
 set_global_assignment -name QIP_FILE src/RAM1.qip
 set_global_assignment -name QIP_FILE src/ParallelAdd.qip
+set_global_assignment -name QIP_FILE src/Pll100MHz.qip
+set_global_assignment -name VERILOG_FILE src/SpiTest.v
 set_global_assignment -name VECTOR_WAVEFORM_FILE waveform/Main.vwf
 set_global_assignment -name VECTOR_WAVEFORM_FILE waveform/FirFilter.vwf
 set_global_assignment -name VECTOR_WAVEFORM_FILE waveform/SpiSlave.vwf
-set_global_assignment -name QIP_FILE src/Pll100MHz.qip
-set_global_assignment -name VERILOG_FILE src/SpiTest.v
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
