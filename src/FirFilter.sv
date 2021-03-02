@@ -13,16 +13,17 @@ module FirFilter
 	input clkIn,
 	input nResetIn,
 	input startIn,
-	input [SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataIn,
+	input [IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataIn,
 	output doneOut,
 	output busyOut,
-	output [32 * SAMPLES_NUM - 1:0] dataOut
+	output [OUT_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataOut
 );
 
-localparam SAMPLE_WIDTH = 16;
+localparam IN_SAMPLE_WIDTH = 16;
+localparam OUT_SAMPLE_WIDTH = 32;
 localparam WORD_WIDTH = 128;
 localparam WORDS_NUM = 1024;
-localparam BUFF_WIDTH = WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM;
+localparam BUFF_WIDTH = WORD_WIDTH + IN_SAMPLE_WIDTH * SAMPLES_NUM;
 
 reg [BUFF_WIDTH - 1:0] buffShifter;
 reg [WORD_WIDTH - 1:0] firReg;
@@ -47,7 +48,7 @@ integer n;
 assign doneOut = done;
 assign busyOut = busy;
 assign buffDataLoad = {dataIn, buffWord};
-assign buffDataShift = {buffShifter[SAMPLE_WIDTH * SAMPLES_NUM - 1:0], buffWord};
+assign buffDataShift = {buffShifter[IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0], buffWord};
 
 ROM1 firStorage(
 	.clock(~clkIn),
@@ -59,7 +60,7 @@ RAM1 buffStorage (
 	.clock(~clkIn),
 	.address(wordIndex),
 	.wren(buffWren),
-	.data(buffShifter[BUFF_WIDTH - 1:SAMPLE_WIDTH * SAMPLES_NUM]),
+	.data(buffShifter[BUFF_WIDTH - 1:IN_SAMPLE_WIDTH * SAMPLES_NUM]),
 	.q(buffWord)
 );
 
@@ -77,27 +78,27 @@ generate
     for (i = 0; i < SAMPLES_NUM; i = i + 1) begin : accumulators_generation
     MultAdd multAdd1(
 		.clock0(~clkIn & busy),
-		.dataa_0(firReg[SAMPLE_WIDTH * 1 - 1:SAMPLE_WIDTH * 0]),
-		.datab_0(buffShifter[SAMPLE_WIDTH * (2 + i) - 1:SAMPLE_WIDTH * (1 + i)]),
-		.dataa_1(firReg[SAMPLE_WIDTH * 2 - 1:SAMPLE_WIDTH * 1]),
-		.datab_1(buffShifter[SAMPLE_WIDTH * (3 + i) - 1:SAMPLE_WIDTH * (2 + i)]),
-		.dataa_2(firReg[SAMPLE_WIDTH * 3 - 1:SAMPLE_WIDTH * 2]),
-		.datab_2(buffShifter[SAMPLE_WIDTH * (4 + i) - 1:SAMPLE_WIDTH * (3 + i)]),
-		.dataa_3(firReg[SAMPLE_WIDTH * 4 - 1:SAMPLE_WIDTH * 3]),
-		.datab_3(buffShifter[SAMPLE_WIDTH * (5 + i) - 1:SAMPLE_WIDTH * (4 + i)]),
+		.dataa_0(firReg[IN_SAMPLE_WIDTH * 1 - 1:IN_SAMPLE_WIDTH * 0]),
+		.datab_0(buffShifter[IN_SAMPLE_WIDTH * (2 + i) - 1:IN_SAMPLE_WIDTH * (1 + i)]),
+		.dataa_1(firReg[IN_SAMPLE_WIDTH * 2 - 1:IN_SAMPLE_WIDTH * 1]),
+		.datab_1(buffShifter[IN_SAMPLE_WIDTH * (3 + i) - 1:IN_SAMPLE_WIDTH * (2 + i)]),
+		.dataa_2(firReg[IN_SAMPLE_WIDTH * 3 - 1:IN_SAMPLE_WIDTH * 2]),
+		.datab_2(buffShifter[IN_SAMPLE_WIDTH * (4 + i) - 1:IN_SAMPLE_WIDTH * (3 + i)]),
+		.dataa_3(firReg[IN_SAMPLE_WIDTH * 4 - 1:IN_SAMPLE_WIDTH * 3]),
+		.datab_3(buffShifter[IN_SAMPLE_WIDTH * (5 + i) - 1:IN_SAMPLE_WIDTH * (4 + i)]),
 		.result(multAddResult1[i])
 	);
 
 	MultAdd multAdd2(
 		.clock0(~clkIn & busy),
-		.dataa_0(firReg[SAMPLE_WIDTH * 5 - 1:SAMPLE_WIDTH * 4]),
-		.datab_0(buffShifter[SAMPLE_WIDTH * (6 + i) - 1:SAMPLE_WIDTH * (5 + i)]),
-		.dataa_1(firReg[SAMPLE_WIDTH * 6 - 1:SAMPLE_WIDTH * 5]),
-		.datab_1(buffShifter[SAMPLE_WIDTH * (7 + i) - 1:SAMPLE_WIDTH * (6 + i)]),
-		.dataa_2(firReg[SAMPLE_WIDTH * 7 - 1:SAMPLE_WIDTH * 6]),
-		.datab_2(buffShifter[SAMPLE_WIDTH * (8 + i) - 1:SAMPLE_WIDTH * (7 + i)]),
-		.dataa_3(firReg[SAMPLE_WIDTH * 8 - 1:SAMPLE_WIDTH * 7]),
-		.datab_3(buffShifter[SAMPLE_WIDTH * (9 + i) - 1:SAMPLE_WIDTH * (8 + i)]),
+		.dataa_0(firReg[IN_SAMPLE_WIDTH * 5 - 1:IN_SAMPLE_WIDTH * 4]),
+		.datab_0(buffShifter[IN_SAMPLE_WIDTH * (6 + i) - 1:IN_SAMPLE_WIDTH * (5 + i)]),
+		.dataa_1(firReg[IN_SAMPLE_WIDTH * 6 - 1:IN_SAMPLE_WIDTH * 5]),
+		.datab_1(buffShifter[IN_SAMPLE_WIDTH * (7 + i) - 1:IN_SAMPLE_WIDTH * (6 + i)]),
+		.dataa_2(firReg[IN_SAMPLE_WIDTH * 7 - 1:IN_SAMPLE_WIDTH * 6]),
+		.datab_2(buffShifter[IN_SAMPLE_WIDTH * (8 + i) - 1:IN_SAMPLE_WIDTH * (7 + i)]),
+		.dataa_3(firReg[IN_SAMPLE_WIDTH * 8 - 1:IN_SAMPLE_WIDTH * 7]),
+		.datab_3(buffShifter[IN_SAMPLE_WIDTH * (9 + i) - 1:IN_SAMPLE_WIDTH * (8 + i)]),
 		.result(multAddResult2[i])
 	);
 

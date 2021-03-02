@@ -18,7 +18,7 @@ module Main
 localparam PACKET_SIZE = 8;
 localparam SAMPLES_NUM = 2;
 localparam BYTE_SIZE = 8;
-localparam SAMPLE_WIDTH = 16;
+localparam IN_SAMPLE_WIDTH = 16;
 
 reg [BYTE_SIZE * PACKET_SIZE * 2 - 1:0] dataBuff;
 
@@ -26,9 +26,9 @@ wire dataReceived;
 wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataRaw;
 wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataComputed;
 
-wire [SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataLoad = {
-	dataRaw[SAMPLE_WIDTH * 3 - 1:SAMPLE_WIDTH * 2], 
-	dataRaw[SAMPLE_WIDTH * 4 - 1:SAMPLE_WIDTH * 3]};
+wire [IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataLoad = {
+	dataRaw[IN_SAMPLE_WIDTH * 3 - 1:IN_SAMPLE_WIDTH * 2], 
+	dataRaw[IN_SAMPLE_WIDTH * 4 - 1:IN_SAMPLE_WIDTH * 3]};
 
 wire clk;
 wire ss;
