@@ -22,9 +22,9 @@ module FirFilter
 localparam SAMPLE_WIDTH = 16;
 localparam WORD_WIDTH = 128;
 localparam WORDS_NUM = 1024;
-localparam TOTAL_WIDTH = WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM;
+localparam BUFF_WIDTH = WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM;
 
-reg [WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM - 1:0] buffShifter;
+reg [BUFF_WIDTH - 1:0] buffShifter;
 reg [WORD_WIDTH - 1:0] firReg;
 reg [$clog2(WORDS_NUM) - 1:0] wordIndex;
 reg signed [33:0] accumulator[SAMPLES_NUM];
@@ -33,8 +33,8 @@ reg memoryDelay;
 reg busy;
 reg done;
 
-wire [TOTAL_WIDTH - 1:0] buffDataLoad;
-wire [TOTAL_WIDTH - 1:0] buffDataShift;
+wire [BUFF_WIDTH - 1:0] buffDataLoad;
+wire [BUFF_WIDTH - 1:0] buffDataShift;
 wire signed [33:0] multAddResult1[SAMPLES_NUM];
 wire signed [33:0] multAddResult2[SAMPLES_NUM];
 wire signed [33:0] parallelAddResult[SAMPLES_NUM];
@@ -59,7 +59,7 @@ RAM1 buffStorage (
 	.clock(~clkIn),
 	.address(wordIndex),
 	.wren(buffWren),
-	.data(buffShifter[TOTAL_WIDTH - 1:SAMPLE_WIDTH * SAMPLES_NUM]),
+	.data(buffShifter[BUFF_WIDTH - 1:SAMPLE_WIDTH * SAMPLES_NUM]),
 	.q(buffWord)
 );
 
