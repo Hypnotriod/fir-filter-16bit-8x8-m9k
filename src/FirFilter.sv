@@ -27,7 +27,7 @@ localparam TOTAL_WIDTH = WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM;
 reg [WORD_WIDTH + SAMPLE_WIDTH * SAMPLES_NUM - 1:0] buffShifter;
 reg [WORD_WIDTH - 1:0] firReg;
 reg [$clog2(WORDS_NUM) - 1:0] wordIndex;
-reg [33:0] accumulator[SAMPLES_NUM];
+reg signed [33:0] accumulator[SAMPLES_NUM];
 reg buffWren;
 reg memoryDelay;
 reg busy;
@@ -35,9 +35,9 @@ reg done;
 
 wire [TOTAL_WIDTH - 1:0] buffDataLoad;
 wire [TOTAL_WIDTH - 1:0] buffDataShift;
-wire [33:0] multAddResult1[SAMPLES_NUM];
-wire [33:0] multAddResult2[SAMPLES_NUM];
-wire [33:0] parallelAddResult[SAMPLES_NUM];
+wire signed [33:0] multAddResult1[SAMPLES_NUM];
+wire signed [33:0] multAddResult2[SAMPLES_NUM];
+wire signed [33:0] parallelAddResult[SAMPLES_NUM];
 wire [WORD_WIDTH - 1:0] firWord;
 wire [WORD_WIDTH - 1:0] buffWord;
 
