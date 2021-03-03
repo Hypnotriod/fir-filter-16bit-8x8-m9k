@@ -55,9 +55,9 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
 	.dataIn(dataBuff[BYTE_SIZE * PACKET_SIZE * 2 - 1:BYTE_SIZE * PACKET_SIZE]),
 	.dataOut(dataRaw),
 	.misoOut(misoOut),
-	.dataReceivedOut(dataReceived)
-	//.emptyOut(),
-	//.busyOut()
+	.dataReceivedOut(dataReceived),
+	.emptyOut(),
+	.busyOut()
 );
 
 FirFilter #(.SAMPLES_NUM(SAMPLES_NUM)) firFilter(
@@ -65,9 +65,9 @@ FirFilter #(.SAMPLES_NUM(SAMPLES_NUM)) firFilter(
 	.nResetIn(nResetIn),
 	.startIn(dataReceived),
 	.dataIn(dataLoad),
+	.dataOut(dataComputed),
 	.doneOut(computationComplete),
-	//.busyOut(),
-	.dataOut(dataComputed)
+	.busyOut()
 );
 
 always @(posedge clk or negedge nResetIn) begin
