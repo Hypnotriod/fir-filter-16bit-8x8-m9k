@@ -68,9 +68,9 @@ set_global_assignment -name SYSTEMVERILOG_FILE src/RXMajority3Filter.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/Main.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/SpiSlave.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/FirFilter.sv
+set_global_assignment -name QIP_FILE src/FirRam.qip
+set_global_assignment -name QIP_FILE src/BufferRam.qip
 set_global_assignment -name QIP_FILE src/MultAdd.qip
-set_global_assignment -name QIP_FILE src/ROM1.qip
-set_global_assignment -name QIP_FILE src/RAM1.qip
 set_global_assignment -name QIP_FILE src/ParallelAdd.qip
 set_global_assignment -name QIP_FILE src/Pll100MHz.qip
 set_global_assignment -name VERILOG_FILE src/SpiTest.v

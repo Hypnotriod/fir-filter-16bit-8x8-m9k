@@ -23,14 +23,16 @@ localparam IN_SAMPLE_WIDTH = 16;
 localparam OUT_SAMPLE_WIDTH = 32;
 localparam WORD_WIDTH = 128;
 localparam WORDS_NUM = 1024;
+localparam RESULT_DELAY = 3;
 localparam BUFF_WIDTH = WORD_WIDTH + IN_SAMPLE_WIDTH * SAMPLES_NUM;
 
 reg [BUFF_WIDTH - 1:0] buffShifter;
 reg [WORD_WIDTH - 1:0] firReg;
-reg [$clog2(WORDS_NUM) - 1:0] wordIndex;
+reg [$clog2(WORDS_NUM) - 1:0] rdWordIndex;
+reg [$clog2(WORDS_NUM) - 1:0] wrWordIndex;
 reg signed [33:0] accumulator[SAMPLES_NUM];
+reg [$clog2(RESULT_DELAY):0] resultDelay;
 reg buffWren;
-reg memoryDelay;
 reg busy;
 reg done;
 
@@ -50,15 +52,18 @@ assign busyOut = busy;
 assign buffDataLoad = {dataIn, buffWord};
 assign buffDataShift = {buffShifter[IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0], buffWord};
 
-ROM1 firStorage(
+FirRam firStorage(
 	.clock(~clkIn),
-	.address(wordIndex),
+	.address(rdWordIndex),
+	.wren(0),
+	.data(0),
 	.q(firWord)
 );
 
-RAM1 buffStorage (
+BufferRam buffStorage (
 	.clock(~clkIn),
-	.address(wordIndex),
+	.rdaddress(rdWordIndex),
+	.wraddress(wrWordIndex),
 	.wren(buffWren),
 	.data(buffShifter[BUFF_WIDTH - 1:IN_SAMPLE_WIDTH * SAMPLES_NUM]),
 	.q(buffWord)
@@ -138,44 +143,48 @@ always @(posedge clkIn or negedge nResetIn) begin
 		for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
 			accumulator[n] <= 0;
 		end
-		wordIndex <= 0;
+		rdWordIndex <= 0;
+		wrWordIndex <= 0;
 		busy <= 0;
 		done <= 0;
 		buffWren <= 0;
-		memoryDelay <= 0;
+		resultDelay <= 0;
 	end
 	else if(startIn && !busy) begin
+		resultDelay <= RESULT_DELAY;
 		busy <= 1;
 		buffWren <= 1;
-		memoryDelay <= 1;
 		for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
 			accumulator[n] <= 0;
 		end
 		buffShifter <= buffDataLoad;
 		firReg <= firWord;
+		rdWordIndex <= rdWordIndex + 1;
 	end
 	else if (buffWren) begin
 		buffWren <= 0;
-		wordIndex <= wordIndex + 1;
+		wrWordIndex <= wrWordIndex + 1;
 	end
-	else if (memoryDelay) begin
-		memoryDelay <= 0;
-	end
-	else if(wordIndex != 0) begin
+	else if(rdWordIndex != 0) begin
 		buffWren <= 1;
-		memoryDelay <= 1;
 		for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
 			accumulator[n] <= parallelAddResult[n] + accumulator[n];
 		end
 		buffShifter <= buffDataShift;
 		firReg <= firWord;
+		rdWordIndex <= rdWordIndex + 1;
 	end
 	else if(busy) begin
-		for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
-			accumulator[n] <= parallelAddResult[n] + accumulator[n];
+		if (resultDelay[0]) begin
+			for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
+				accumulator[n] <= parallelAddResult[n] + accumulator[n];
+			end
 		end
-		busy <= 0;
-		done <= 1;
+		if (resultDelay == 1) begin
+			busy <= 0;
+			done <= 1;
+		end
+		resultDelay <= resultDelay - 1;
 	end
 	else if(done == 1) begin
 		done <= 0;

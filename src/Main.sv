@@ -3,6 +3,19 @@
 * Main.sv
 *
 *  Author: Ilya Pikin
+*
+*  Description:
+*  This module does fir filter calculation of 16 bit samples.
+*
+*  Usage:
+*  Data should be sent in packets via SPI (cpol=0, cpha=0) as {SAMPLES_NUM} of
+*  16 bit samples data (msb first), followed by {SAMPLES_NUM * 2} of don't care bytes.
+*  Each packet transaction user will grab {SAMPLES_NUM} of 32 bit computed samples
+*  (msb first) back, delayed by two packet transactions.
+*  {ssIn} signal can be not necessary toggled each packet transaction. 
+*  But setting this signal high in the middle of transaction will abort it.
+*  {SAMPLES_NUM} can range from 1 to 8
+* 
 */
 
 module Main
