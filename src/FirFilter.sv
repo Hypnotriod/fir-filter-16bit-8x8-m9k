@@ -31,7 +31,7 @@ reg [WORD_WIDTH - 1:0] firReg;
 reg [$clog2(WORDS_NUM) - 1:0] rdWordIndex;
 reg [$clog2(WORDS_NUM) - 1:0] wrWordIndex;
 reg signed [33:0] accumulator[SAMPLES_NUM];
-reg [$clog2(RESULT_DELAY):0] resultDelay;
+reg [$clog2(RESULT_DELAY) - 1:0] resultDelay;
 reg buffWren;
 reg busy;
 reg done;
