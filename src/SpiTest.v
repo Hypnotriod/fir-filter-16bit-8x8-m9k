@@ -40,9 +40,9 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
 	.dataIn(dataTx),
 	.dataOut(dataRx),
 	.misoOut(misoOut),
-	.dataReceivedOut(dataReceived)
-	//.emptyOut(),
-	//.busyOut()
+	.dataReceivedOut(dataReceived),
+	.emptyOut(),
+	.busyOut()
 );
 
 always @(posedge clkIn or negedge nResetIn) begin

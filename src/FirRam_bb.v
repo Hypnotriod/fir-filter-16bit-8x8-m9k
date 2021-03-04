@@ -4,7 +4,7 @@
 // MODULE: altsyncram 
 
 // ============================================================
-// File Name: RAM1.v
+// File Name: FirRam.v
 // Megafunction Name(s):
 // 			altsyncram
 //
@@ -32,7 +32,7 @@
 //refer to the applicable agreement for further details, at
 //https://fpgasoftware.intel.com/eula.
 
-module RAM1 (
+module FirRam (
 	address,
 	clock,
 	data,
@@ -76,9 +76,9 @@ endmodule
 // Retrieval info: PRIVATE: JTAG_ENABLED NUMERIC "0"
 // Retrieval info: PRIVATE: JTAG_ID STRING "NONE"
 // Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "0"
-// Retrieval info: PRIVATE: MIFfilename STRING "./data/buffer.mif"
+// Retrieval info: PRIVATE: MIFfilename STRING "../data/impulse.mif"
 // Retrieval info: PRIVATE: NUMWORDS_A NUMERIC "1024"
-// Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "2"
+// Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "0"
 // Retrieval info: PRIVATE: READ_DURING_WRITE_MODE_PORT_A NUMERIC "3"
 // Retrieval info: PRIVATE: RegAddr NUMERIC "1"
 // Retrieval info: PRIVATE: RegData NUMERIC "1"
@@ -93,7 +93,7 @@ endmodule
 // Retrieval info: LIBRARY: altera_mf altera_mf.altera_mf_components.all
 // Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_A STRING "BYPASS"
 // Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "BYPASS"
-// Retrieval info: CONSTANT: INIT_FILE STRING "./data/buffer.mif"
+// Retrieval info: CONSTANT: INIT_FILE STRING "../data/impulse.mif"
 // Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone IV E"
 // Retrieval info: CONSTANT: LPM_HINT STRING "ENABLE_RUNTIME_MOD=NO"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "altsyncram"
@@ -102,7 +102,6 @@ endmodule
 // Retrieval info: CONSTANT: OUTDATA_ACLR_A STRING "NONE"
 // Retrieval info: CONSTANT: OUTDATA_REG_A STRING "CLOCK0"
 // Retrieval info: CONSTANT: POWER_UP_UNINITIALIZED STRING "FALSE"
-// Retrieval info: CONSTANT: RAM_BLOCK_TYPE STRING "M9K"
 // Retrieval info: CONSTANT: READ_DURING_WRITE_MODE_PORT_A STRING "NEW_DATA_NO_NBE_READ"
 // Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "10"
 // Retrieval info: CONSTANT: WIDTH_A NUMERIC "128"
@@ -117,10 +116,10 @@ endmodule
 // Retrieval info: CONNECT: @data_a 0 0 128 0 data 0 0 128 0
 // Retrieval info: CONNECT: @wren_a 0 0 0 0 wren 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 128 0 @q_a 0 0 128 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL RAM1.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL RAM1.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL RAM1.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL RAM1.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL RAM1_inst.v FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL RAM1_bb.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FirRam.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FirRam.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FirRam.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FirRam.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FirRam_inst.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FirRam_bb.v TRUE
 // Retrieval info: LIB_FILE: altera_mf
