@@ -30,6 +30,7 @@ module Main
 
 localparam PACKET_SIZE = 8;
 localparam SAMPLES_NUM = 2;
+localparam WORDS_NUM = 1024;
 localparam BYTE_SIZE = 8;
 localparam IN_SAMPLE_WIDTH = 16;
 
@@ -73,7 +74,7 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
 	.busyOut()
 );
 
-FirFilter #(.SAMPLES_NUM(SAMPLES_NUM)) firFilter(
+FirFilter #(.SAMPLES_NUM(SAMPLES_NUM), .WORDS_NUM(WORDS_NUM)) firFilter(
 	.clkIn(clk),
 	.nResetIn(nResetIn),
 	.startIn(dataReceived),

@@ -38,11 +38,15 @@
 `timescale 1 ps / 1 ps
 // synopsys translate_on
 module ParallelAdd (
+	aclr,
+	clken,
 	clock,
 	data0x,
 	data1x,
 	result);
 
+	input	  aclr;
+	input	  clken;
 	input	  clock;
 	input	[33:0]  data0x;
 	input	[33:0]  data1x;
@@ -50,6 +54,8 @@ module ParallelAdd (
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_off
 `endif
+	tri0	  aclr;
+	tri1	  clken;
 	tri0	  clock;
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_on
@@ -62,15 +68,11 @@ module ParallelAdd (
 	wire [33:0] result = sub_wire3[33:0];
 
 	parallel_add	parallel_add_component (
+				.aclr (aclr),
+				.clken (clken),
 				.clock (clock),
 				.data (sub_wire1),
-				.result (sub_wire3)
-				// synopsys translate_off
-				,
-				.aclr (),
-				.clken ()
-				// synopsys translate_on
-				);
+				.result (sub_wire3));
 	defparam
 		parallel_add_component.msw_subtract = "NO",
 		parallel_add_component.pipeline = 1,
@@ -98,10 +100,14 @@ endmodule
 // Retrieval info: CONSTANT: SIZE NUMERIC "2"
 // Retrieval info: CONSTANT: WIDTH NUMERIC "34"
 // Retrieval info: CONSTANT: WIDTHR NUMERIC "34"
+// Retrieval info: USED_PORT: aclr 0 0 0 0 INPUT GND "aclr"
+// Retrieval info: USED_PORT: clken 0 0 0 0 INPUT VCC "clken"
 // Retrieval info: USED_PORT: clock 0 0 0 0 INPUT GND "clock"
 // Retrieval info: USED_PORT: data0x 0 0 34 0 INPUT NODEFVAL "data0x[33..0]"
 // Retrieval info: USED_PORT: data1x 0 0 34 0 INPUT NODEFVAL "data1x[33..0]"
 // Retrieval info: USED_PORT: result 0 0 34 0 OUTPUT NODEFVAL "result[33..0]"
+// Retrieval info: CONNECT: @aclr 0 0 0 0 aclr 0 0 0 0
+// Retrieval info: CONNECT: @clken 0 0 0 0 clken 0 0 0 0
 // Retrieval info: CONNECT: @clock 0 0 0 0 clock 0 0 0 0
 // Retrieval info: CONNECT: @data 0 0 34 0 data0x 0 0 34 0
 // Retrieval info: CONNECT: @data 0 0 34 34 data1x 0 0 34 0

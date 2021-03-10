@@ -38,6 +38,7 @@
 `timescale 1 ps / 1 ps
 // synopsys translate_on
 module MultAdd (
+	aclr3,
 	clock0,
 	dataa_0,
 	dataa_1,
@@ -47,8 +48,10 @@ module MultAdd (
 	datab_1,
 	datab_2,
 	datab_3,
+	ena0,
 	result);
 
+	input	  aclr3;
 	input	  clock0;
 	input	[15:0]  dataa_0;
 	input	[15:0]  dataa_1;
@@ -58,10 +61,12 @@ module MultAdd (
 	input	[15:0]  datab_1;
 	input	[15:0]  datab_2;
 	input	[15:0]  datab_3;
+	input	  ena0;
 	output	[33:0]  result;
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_off
 `endif
+	tri0	  aclr3;
 	tri1	  clock0;
 	tri0	[15:0]  dataa_0;
 	tri0	[15:0]  dataa_1;
@@ -71,6 +76,7 @@ module MultAdd (
 	tri0	[15:0]  datab_1;
 	tri0	[15:0]  datab_2;
 	tri0	[15:0]  datab_3;
+	tri1	  ena0;
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_on
 `endif
@@ -89,15 +95,16 @@ module MultAdd (
 	wire [33:0] result = sub_wire10[33:0];
 
 	altmult_add	ALTMULT_ADD_component (
+				.aclr3 (aclr3),
 				.clock0 (clock0),
 				.dataa (sub_wire1),
 				.datab (sub_wire6),
+				.ena0 (ena0),
 				.result (sub_wire10),
 				.accum_sload (1'b0),
 				.aclr0 (1'b0),
 				.aclr1 (1'b0),
 				.aclr2 (1'b0),
-				.aclr3 (1'b0),
 				.addnsub1 (1'b1),
 				.addnsub1_round (1'b0),
 				.addnsub3 (1'b1),
@@ -114,7 +121,6 @@ module MultAdd (
 				.coefsel2 ({3{1'b0}}),
 				.coefsel3 ({3{1'b0}}),
 				.datac ({88{1'b0}}),
-				.ena0 (1'b1),
 				.ena1 (1'b1),
 				.ena2 (1'b1),
 				.ena3 (1'b1),
@@ -142,23 +148,23 @@ module MultAdd (
 				.zero_chainout (1'b0),
 				.zero_loopback (1'b0));
 	defparam
-		ALTMULT_ADD_component.addnsub_multiplier_aclr1 = "UNUSED",
-		ALTMULT_ADD_component.addnsub_multiplier_aclr3 = "UNUSED",
-		ALTMULT_ADD_component.addnsub_multiplier_pipeline_aclr1 = "UNUSED",
-		ALTMULT_ADD_component.addnsub_multiplier_pipeline_aclr3 = "UNUSED",
+		ALTMULT_ADD_component.addnsub_multiplier_aclr1 = "ACLR3",
+		ALTMULT_ADD_component.addnsub_multiplier_aclr3 = "ACLR3",
+		ALTMULT_ADD_component.addnsub_multiplier_pipeline_aclr1 = "ACLR3",
+		ALTMULT_ADD_component.addnsub_multiplier_pipeline_aclr3 = "ACLR3",
 		ALTMULT_ADD_component.addnsub_multiplier_pipeline_register1 = "CLOCK0",
 		ALTMULT_ADD_component.addnsub_multiplier_pipeline_register3 = "CLOCK0",
 		ALTMULT_ADD_component.addnsub_multiplier_register1 = "CLOCK0",
 		ALTMULT_ADD_component.addnsub_multiplier_register3 = "CLOCK0",
 		ALTMULT_ADD_component.dedicated_multiplier_circuitry = "AUTO",
-		ALTMULT_ADD_component.input_aclr_a0 = "UNUSED",
-		ALTMULT_ADD_component.input_aclr_a1 = "UNUSED",
-		ALTMULT_ADD_component.input_aclr_a2 = "UNUSED",
-		ALTMULT_ADD_component.input_aclr_a3 = "UNUSED",
-		ALTMULT_ADD_component.input_aclr_b0 = "UNUSED",
-		ALTMULT_ADD_component.input_aclr_b1 = "UNUSED",
-		ALTMULT_ADD_component.input_aclr_b2 = "UNUSED",
-		ALTMULT_ADD_component.input_aclr_b3 = "UNUSED",
+		ALTMULT_ADD_component.input_aclr_a0 = "ACLR3",
+		ALTMULT_ADD_component.input_aclr_a1 = "ACLR3",
+		ALTMULT_ADD_component.input_aclr_a2 = "ACLR3",
+		ALTMULT_ADD_component.input_aclr_a3 = "ACLR3",
+		ALTMULT_ADD_component.input_aclr_b0 = "ACLR3",
+		ALTMULT_ADD_component.input_aclr_b1 = "ACLR3",
+		ALTMULT_ADD_component.input_aclr_b2 = "ACLR3",
+		ALTMULT_ADD_component.input_aclr_b3 = "ACLR3",
 		ALTMULT_ADD_component.input_register_a0 = "CLOCK0",
 		ALTMULT_ADD_component.input_register_a1 = "CLOCK0",
 		ALTMULT_ADD_component.input_register_a2 = "CLOCK0",
@@ -179,16 +185,16 @@ module MultAdd (
 		ALTMULT_ADD_component.lpm_type = "altmult_add",
 		ALTMULT_ADD_component.multiplier1_direction = "ADD",
 		ALTMULT_ADD_component.multiplier3_direction = "ADD",
-		ALTMULT_ADD_component.multiplier_aclr0 = "UNUSED",
-		ALTMULT_ADD_component.multiplier_aclr1 = "UNUSED",
-		ALTMULT_ADD_component.multiplier_aclr2 = "UNUSED",
-		ALTMULT_ADD_component.multiplier_aclr3 = "UNUSED",
+		ALTMULT_ADD_component.multiplier_aclr0 = "ACLR3",
+		ALTMULT_ADD_component.multiplier_aclr1 = "ACLR3",
+		ALTMULT_ADD_component.multiplier_aclr2 = "ACLR3",
+		ALTMULT_ADD_component.multiplier_aclr3 = "ACLR3",
 		ALTMULT_ADD_component.multiplier_register0 = "CLOCK0",
 		ALTMULT_ADD_component.multiplier_register1 = "CLOCK0",
 		ALTMULT_ADD_component.multiplier_register2 = "CLOCK0",
 		ALTMULT_ADD_component.multiplier_register3 = "CLOCK0",
 		ALTMULT_ADD_component.number_of_multipliers = 4,
-		ALTMULT_ADD_component.output_aclr = "UNUSED",
+		ALTMULT_ADD_component.output_aclr = "ACLR3",
 		ALTMULT_ADD_component.output_register = "CLOCK0",
 		ALTMULT_ADD_component.port_addnsub1 = "PORT_UNUSED",
 		ALTMULT_ADD_component.port_addnsub3 = "PORT_UNUSED",
@@ -196,10 +202,10 @@ module MultAdd (
 		ALTMULT_ADD_component.port_signb = "PORT_UNUSED",
 		ALTMULT_ADD_component.representation_a = "SIGNED",
 		ALTMULT_ADD_component.representation_b = "SIGNED",
-		ALTMULT_ADD_component.signed_aclr_a = "UNUSED",
-		ALTMULT_ADD_component.signed_aclr_b = "UNUSED",
-		ALTMULT_ADD_component.signed_pipeline_aclr_a = "UNUSED",
-		ALTMULT_ADD_component.signed_pipeline_aclr_b = "UNUSED",
+		ALTMULT_ADD_component.signed_aclr_a = "ACLR3",
+		ALTMULT_ADD_component.signed_aclr_b = "ACLR3",
+		ALTMULT_ADD_component.signed_pipeline_aclr_a = "ACLR3",
+		ALTMULT_ADD_component.signed_pipeline_aclr_b = "ACLR3",
 		ALTMULT_ADD_component.signed_pipeline_register_a = "CLOCK0",
 		ALTMULT_ADD_component.signed_pipeline_register_b = "CLOCK0",
 		ALTMULT_ADD_component.signed_register_a = "CLOCK0",
@@ -226,8 +232,8 @@ endmodule
 // Retrieval info: PRIVATE: ADDNSUB3_PIPE_CLK_SRC NUMERIC "0"
 // Retrieval info: PRIVATE: ADDNSUB3_PIPE_REG STRING "1"
 // Retrieval info: PRIVATE: ADDNSUB3_REG STRING "1"
-// Retrieval info: PRIVATE: ADD_ENABLE NUMERIC "0"
-// Retrieval info: PRIVATE: ALL_REG_ACLR NUMERIC "0"
+// Retrieval info: PRIVATE: ADD_ENABLE NUMERIC "1"
+// Retrieval info: PRIVATE: ALL_REG_ACLR NUMERIC "1"
 // Retrieval info: PRIVATE: A_ACLR_SRC_MULT0 NUMERIC "3"
 // Retrieval info: PRIVATE: A_CLK_SRC_MULT0 NUMERIC "0"
 // Retrieval info: PRIVATE: B_ACLR_SRC_MULT0 NUMERIC "3"
@@ -281,23 +287,23 @@ endmodule
 // Retrieval info: PRIVATE: WIDTHA STRING "16"
 // Retrieval info: PRIVATE: WIDTHB STRING "16"
 // Retrieval info: LIBRARY: altera_mf altera_mf.altera_mf_components.all
-// Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_ACLR1 STRING "UNUSED"
-// Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_ACLR3 STRING "UNUSED"
-// Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_PIPELINE_ACLR1 STRING "UNUSED"
-// Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_PIPELINE_ACLR3 STRING "UNUSED"
+// Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_ACLR1 STRING "ACLR3"
+// Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_ACLR3 STRING "ACLR3"
+// Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_PIPELINE_ACLR1 STRING "ACLR3"
+// Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_PIPELINE_ACLR3 STRING "ACLR3"
 // Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_PIPELINE_REGISTER1 STRING "CLOCK0"
 // Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_PIPELINE_REGISTER3 STRING "CLOCK0"
 // Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_REGISTER1 STRING "CLOCK0"
 // Retrieval info: CONSTANT: ADDNSUB_MULTIPLIER_REGISTER3 STRING "CLOCK0"
 // Retrieval info: CONSTANT: DEDICATED_MULTIPLIER_CIRCUITRY STRING "AUTO"
-// Retrieval info: CONSTANT: INPUT_ACLR_A0 STRING "UNUSED"
-// Retrieval info: CONSTANT: INPUT_ACLR_A1 STRING "UNUSED"
-// Retrieval info: CONSTANT: INPUT_ACLR_A2 STRING "UNUSED"
-// Retrieval info: CONSTANT: INPUT_ACLR_A3 STRING "UNUSED"
-// Retrieval info: CONSTANT: INPUT_ACLR_B0 STRING "UNUSED"
-// Retrieval info: CONSTANT: INPUT_ACLR_B1 STRING "UNUSED"
-// Retrieval info: CONSTANT: INPUT_ACLR_B2 STRING "UNUSED"
-// Retrieval info: CONSTANT: INPUT_ACLR_B3 STRING "UNUSED"
+// Retrieval info: CONSTANT: INPUT_ACLR_A0 STRING "ACLR3"
+// Retrieval info: CONSTANT: INPUT_ACLR_A1 STRING "ACLR3"
+// Retrieval info: CONSTANT: INPUT_ACLR_A2 STRING "ACLR3"
+// Retrieval info: CONSTANT: INPUT_ACLR_A3 STRING "ACLR3"
+// Retrieval info: CONSTANT: INPUT_ACLR_B0 STRING "ACLR3"
+// Retrieval info: CONSTANT: INPUT_ACLR_B1 STRING "ACLR3"
+// Retrieval info: CONSTANT: INPUT_ACLR_B2 STRING "ACLR3"
+// Retrieval info: CONSTANT: INPUT_ACLR_B3 STRING "ACLR3"
 // Retrieval info: CONSTANT: INPUT_REGISTER_A0 STRING "CLOCK0"
 // Retrieval info: CONSTANT: INPUT_REGISTER_A1 STRING "CLOCK0"
 // Retrieval info: CONSTANT: INPUT_REGISTER_A2 STRING "CLOCK0"
@@ -318,16 +324,16 @@ endmodule
 // Retrieval info: CONSTANT: LPM_TYPE STRING "altmult_add"
 // Retrieval info: CONSTANT: MULTIPLIER1_DIRECTION STRING "ADD"
 // Retrieval info: CONSTANT: MULTIPLIER3_DIRECTION STRING "ADD"
-// Retrieval info: CONSTANT: MULTIPLIER_ACLR0 STRING "UNUSED"
-// Retrieval info: CONSTANT: MULTIPLIER_ACLR1 STRING "UNUSED"
-// Retrieval info: CONSTANT: MULTIPLIER_ACLR2 STRING "UNUSED"
-// Retrieval info: CONSTANT: MULTIPLIER_ACLR3 STRING "UNUSED"
+// Retrieval info: CONSTANT: MULTIPLIER_ACLR0 STRING "ACLR3"
+// Retrieval info: CONSTANT: MULTIPLIER_ACLR1 STRING "ACLR3"
+// Retrieval info: CONSTANT: MULTIPLIER_ACLR2 STRING "ACLR3"
+// Retrieval info: CONSTANT: MULTIPLIER_ACLR3 STRING "ACLR3"
 // Retrieval info: CONSTANT: MULTIPLIER_REGISTER0 STRING "CLOCK0"
 // Retrieval info: CONSTANT: MULTIPLIER_REGISTER1 STRING "CLOCK0"
 // Retrieval info: CONSTANT: MULTIPLIER_REGISTER2 STRING "CLOCK0"
 // Retrieval info: CONSTANT: MULTIPLIER_REGISTER3 STRING "CLOCK0"
 // Retrieval info: CONSTANT: NUMBER_OF_MULTIPLIERS NUMERIC "4"
-// Retrieval info: CONSTANT: OUTPUT_ACLR STRING "UNUSED"
+// Retrieval info: CONSTANT: OUTPUT_ACLR STRING "ACLR3"
 // Retrieval info: CONSTANT: OUTPUT_REGISTER STRING "CLOCK0"
 // Retrieval info: CONSTANT: PORT_ADDNSUB1 STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: PORT_ADDNSUB3 STRING "PORT_UNUSED"
@@ -335,10 +341,10 @@ endmodule
 // Retrieval info: CONSTANT: PORT_SIGNB STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: REPRESENTATION_A STRING "SIGNED"
 // Retrieval info: CONSTANT: REPRESENTATION_B STRING "SIGNED"
-// Retrieval info: CONSTANT: SIGNED_ACLR_A STRING "UNUSED"
-// Retrieval info: CONSTANT: SIGNED_ACLR_B STRING "UNUSED"
-// Retrieval info: CONSTANT: SIGNED_PIPELINE_ACLR_A STRING "UNUSED"
-// Retrieval info: CONSTANT: SIGNED_PIPELINE_ACLR_B STRING "UNUSED"
+// Retrieval info: CONSTANT: SIGNED_ACLR_A STRING "ACLR3"
+// Retrieval info: CONSTANT: SIGNED_ACLR_B STRING "ACLR3"
+// Retrieval info: CONSTANT: SIGNED_PIPELINE_ACLR_A STRING "ACLR3"
+// Retrieval info: CONSTANT: SIGNED_PIPELINE_ACLR_B STRING "ACLR3"
 // Retrieval info: CONSTANT: SIGNED_PIPELINE_REGISTER_A STRING "CLOCK0"
 // Retrieval info: CONSTANT: SIGNED_PIPELINE_REGISTER_B STRING "CLOCK0"
 // Retrieval info: CONSTANT: SIGNED_REGISTER_A STRING "CLOCK0"
@@ -346,6 +352,7 @@ endmodule
 // Retrieval info: CONSTANT: WIDTH_A NUMERIC "16"
 // Retrieval info: CONSTANT: WIDTH_B NUMERIC "16"
 // Retrieval info: CONSTANT: WIDTH_RESULT NUMERIC "34"
+// Retrieval info: USED_PORT: aclr3 0 0 0 0 INPUT GND "aclr3"
 // Retrieval info: USED_PORT: clock0 0 0 0 0 INPUT VCC "clock0"
 // Retrieval info: USED_PORT: dataa_0 0 0 16 0 INPUT GND "dataa_0[15..0]"
 // Retrieval info: USED_PORT: dataa_1 0 0 16 0 INPUT GND "dataa_1[15..0]"
@@ -355,7 +362,9 @@ endmodule
 // Retrieval info: USED_PORT: datab_1 0 0 16 0 INPUT GND "datab_1[15..0]"
 // Retrieval info: USED_PORT: datab_2 0 0 16 0 INPUT GND "datab_2[15..0]"
 // Retrieval info: USED_PORT: datab_3 0 0 16 0 INPUT GND "datab_3[15..0]"
+// Retrieval info: USED_PORT: ena0 0 0 0 0 INPUT VCC "ena0"
 // Retrieval info: USED_PORT: result 0 0 34 0 OUTPUT GND "result[33..0]"
+// Retrieval info: CONNECT: @aclr3 0 0 0 0 aclr3 0 0 0 0
 // Retrieval info: CONNECT: @clock0 0 0 0 0 clock0 0 0 0 0
 // Retrieval info: CONNECT: @dataa 0 0 16 0 dataa_0 0 0 16 0
 // Retrieval info: CONNECT: @dataa 0 0 16 16 dataa_1 0 0 16 0
@@ -365,5 +374,6 @@ endmodule
 // Retrieval info: CONNECT: @datab 0 0 16 16 datab_1 0 0 16 0
 // Retrieval info: CONNECT: @datab 0 0 16 32 datab_2 0 0 16 0
 // Retrieval info: CONNECT: @datab 0 0 16 48 datab_3 0 0 16 0
+// Retrieval info: CONNECT: @ena0 0 0 0 0 ena0 0 0 0 0
 // Retrieval info: CONNECT: result 0 0 34 0 @result 0 0 34 0
 // Retrieval info: LIB_FILE: altera_mf

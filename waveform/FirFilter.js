@@ -1,21 +1,24 @@
 Number.prototype.hex = function(bytesNum) {
-	let result = this.toString(16);
+	let result = (this >>> 0).toString(16);
 	while (result.length < bytesNum * 2) { result = '0' + result; }
+	if (result.length > bytesNum * 2) result = result.slice(-bytesNum * 2);
 	return result;
 }
 
-const arr1 = [1, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0, 0];
-const arr2 = [2, 1, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0];
-const arr3 = [3, 2, 1, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0];
-const arr4 = [4, 3, 2, 1, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0];
-const fir = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+const buff = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32];
+const fir = [-1, 12, 18, 17, 9, 0, -4, -1, 5, 6, 0, -13, -26, -36, -40, -43, -47, -52, -50, -41, -24, -5, 6, 8, 1, -8, -12, -7, 1, 10, 15, 14];
 
-const filter = (acc, value, index) => acc += value * fir[index];
+const input = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4];
+const result = [];
 
-const result1 = arr1.reduce(filter, 0);
-const result2 = arr2.reduce(filter, 0);
-const result3 = arr3.reduce(filter, 0);
-const result4 = arr4.reduce(filter, 0);
+const filter = (arr) => (acc, value, index) => acc += value * arr[index];
 
-console.log("dataIn: ", Number(4).hex(2), Number(3).hex(2), Number(2).hex(2), Number(1).hex(2));
-console.log("dataOut: ", result1.hex(4), result2.hex(4), result3.hex(4), result4.hex(4));
+input.forEach(v => {
+	buff.pop();
+	buff.unshift(v);
+	result.push(fir.reduce(filter(buff), 0));
+});
+
+console.log("dataIn: ", input.reduce((acc, v) => acc += v + ', ', ''));
+console.log("dataFir: ", fir.reduce((acc, v) => acc += v + ', ', ''));
+console.log("dataOut: ", result.reduce((acc, v) => acc += v.hex(4) + ' ', ''));
