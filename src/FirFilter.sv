@@ -174,13 +174,14 @@ always @(posedge clkIn or negedge nResetIn) begin
 	end
 	else if (busy) begin
 		clear <= 0;
+		firReg <= firWord;
+		buffShifter <= !buffWren ? buffDataLoad : buffDataShift;
 		
-		if (rdWordIndex != 0 || wrWordIndex != WORDS_NUM - 1) begin
+		if (rdWordIndex != 0) rdWordIndex <= rdWordIndex + 1;
+		
+		if (clear || wrWordIndex != WORDS_NUM - 1) begin
 			buffWren <= 1;
-			if (rdWordIndex != 0) rdWordIndex <= rdWordIndex + 1;
 			wrWordIndex <= wrWordIndex + 1;
-			firReg <= firWord;
-			buffShifter <= !buffWren ? buffDataLoad : buffDataShift;
 		end
 		else begin
 			buffWren <= 0;
