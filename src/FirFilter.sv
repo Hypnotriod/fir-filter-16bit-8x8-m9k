@@ -83,8 +83,8 @@ function [31:0] normalize ([33:0] value);
 endfunction
 
 generate
-    for (i = 0; i < SAMPLES_NUM; i = i + 1) begin : accumulators_generation
-    MultAdd multAdd1(
+for (i = 0; i < SAMPLES_NUM; i = i + 1) begin : accumulators_generation
+	MultAdd multAdd1(
 		.clock0(~clkIn),
 		.aclr3(clear),
 		.ena0(busy),
