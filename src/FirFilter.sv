@@ -175,7 +175,7 @@ always @(posedge clkIn or negedge nResetIn) begin
 	else if (busy) begin
 		clear <= 0;
 		firReg <= firWord;
-		buffShifter <= !buffWren ? buffDataLoad : buffDataShift;
+		buffShifter <= clear ? buffDataLoad : buffDataShift;
 		
 		if (rdWordIndex != 0) rdWordIndex <= rdWordIndex + 1;
 		
