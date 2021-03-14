@@ -73,13 +73,11 @@ BufferRam buffStorage (
 );
 
 function [31:0] normalize ([33:0] value);
-	begin
-		case ({value[33], value[32], value[31]})
-			3'b100, 3'b101, 3'b110: normalize = 32'h80000000;
-			3'b011, 3'b001, 3'b010: normalize = 32'h7FFFFFFF;
-			default: normalize = value[31:0];
-		endcase
-	end
+	case ({value[33], value[32], value[31]})
+		3'b100, 3'b101, 3'b110: normalize = 32'h80000000;
+		3'b011, 3'b001, 3'b010: normalize = 32'h7FFFFFFF;
+		default: normalize = value[31:0];
+	endcase
 endfunction
 
 generate
