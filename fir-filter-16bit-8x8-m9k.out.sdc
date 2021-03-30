@@ -46,6 +46,7 @@ create_clock -name {clkIn} -period 50MHz -waveform { 0.000 10.000 } [get_ports {
 # Create Generated Clock
 #**************************************************************
 
+derive_pll_clocks
 
 
 #**************************************************************
