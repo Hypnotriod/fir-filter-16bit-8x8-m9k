@@ -57,8 +57,9 @@ assign buffDataStore = buffShifter[BUFF_WIDTH - 1:IN_SAMPLE_WIDTH * SAMPLES_NUM]
 
 FirRam firStorage(
 	.clock(~clkIn),
-	.address(rdWordIndex),
-	.wren(0), // TODO: Add possibility to update fir data
+	.rdaddress(rdWordIndex),
+	.wraddress(0), // TODO: Add possibility to update fir data
+	.wren(0),
 	.data(0),
 	.q(firWord)
 );

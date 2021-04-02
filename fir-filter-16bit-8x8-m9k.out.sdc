@@ -69,14 +69,14 @@ set_clock_uncertainty -fall_from [get_clocks {clkIn}] -fall_to [get_clocks {clkI
 # Set Input Delay
 #**************************************************************
 
-set_input_delay -clock { clkIn } 2.000 [get_ports *]
+set_input_delay -clock { clkIn } 2.000 [all_inputs]
 
 
 #**************************************************************
 # Set Output Delay
 #**************************************************************
 
-set_output_delay -clock { clkIn } 1.500 [get_ports *]
+set_output_delay -clock { clkIn } 1.500 [all_outputs]
 
 
 #**************************************************************

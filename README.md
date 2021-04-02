@@ -4,12 +4,12 @@ Designed with `SystemVerilog HDL` in `Quartus` for `Altera Cyclone IV` family.
 Impulse and buffer are stored in `M9K` memory blocks.
 
 #Hardware
-* `EasyFPGA A2.2` board [documentation](https://forum.maxiol.com/lofiversion/index.php/t5332.html)
+* `Qmtech Cyclone IV EP4CE55` board [documentation](https://github.com/ChinaQMTECH/QM_CYCLONE_IV_EP4CE55)
 
 #Pinout
-* CLK -> PIN_23
-* N_RESET -> PIN_25
-* MISO -> PIN_106
-* MOSI -> PIN_105
-* SCK -> PIN_104
-* SS -> PIN_103
+* CLK -> PIN_T2
+* N_RESET -> PIN_W6
+* MISO -> PIN_M20
+* MOSI -> PIN_M19
+* SCK -> PIN_N20
+* SS -> PIN_N19
