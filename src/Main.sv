@@ -110,7 +110,7 @@ Pll100MHz pll100MHz(
 );
 
 SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
-	.clkIn(~clk),
+	.clkIn(clk),
 	.nResetIn(nResetIn),
 	.ssIn(ss),
 	.mosiIn(mosi),
