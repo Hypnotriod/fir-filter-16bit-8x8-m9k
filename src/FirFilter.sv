@@ -45,6 +45,7 @@ wire signed [33:0] multAddResult2[SAMPLES_NUM];
 wire signed [33:0] parallelAddResult[SAMPLES_NUM];
 wire [WORD_WIDTH - 1:0] firWord;
 wire [WORD_WIDTH - 1:0] buffWord;
+wire doBuffWrite;
 
 genvar i;
 integer n;
@@ -54,6 +55,7 @@ assign busyOut = busy;
 assign buffDataLoad = {dataIn, buffWord};
 assign buffDataShift = {buffShifter[IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0], buffWord};
 assign buffDataStore = buffShifter[BUFF_WIDTH - 1:IN_SAMPLE_WIDTH * SAMPLES_NUM];
+assign doBuffWrite = (clear || wrWordIndex != WORDS_NUM - 1);
 
 FirRam firStorage(
 	.clock(~clkIn),
@@ -159,45 +161,42 @@ always @(posedge clkIn or negedge nResetIn) begin
 		buffWren <= 0;
 		resultDelay <= 0;
 	end
-	else if (startIn && !busy) begin
-		resultDelay <= RESULT_DELAY;
-		busy <= 1;
-		done <= 0;
-		clear <= 1;
-		buffWren <= 0;
-		for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
-			accumulator[n] <= 0;
-		end
-		rdWordIndex <= 1;
-		wrWordIndex <= WORDS_NUM - 1;
-	end
-	else if (busy) begin
-		clear <= 0;
-		firReg <= firWord;
-		buffShifter <= clear ? buffDataLoad : buffDataShift;
-		
-		if (rdWordIndex != 0) rdWordIndex <= rdWordIndex + 1;
-		
-		if (clear || wrWordIndex != WORDS_NUM - 1) begin
-			buffWren <= 1;
-			wrWordIndex <= wrWordIndex + 1;
-		end
-		else begin
+	else begin
+	case ({startIn, busy, done})
+		3'b100, 3'b101: begin
+			resultDelay <= RESULT_DELAY;
+			busy <= 1;
+			done <= 0;
+			clear <= 1;
 			buffWren <= 0;
-			resultDelay <= resultDelay - 1;
+			for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
+				accumulator[n] <= 0;
+			end
+			rdWordIndex <= 1;
+			wrWordIndex <= WORDS_NUM - 1;
 		end
-		
-		for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
-			accumulator[n] <= parallelAddResult[n] + accumulator[n];
+		3'b110, 3'b010: begin
+			clear <= 0;
+			firReg <= firWord;
+			buffShifter <= clear ? buffDataLoad : buffDataShift;
+			rdWordIndex <= rdWordIndex + (rdWordIndex != 0 ? 1 : 0);
+			wrWordIndex <= wrWordIndex + doBuffWrite;
+			buffWren <= doBuffWrite;
+			if (!doBuffWrite) resultDelay <= resultDelay - 1;
+			
+			for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
+				accumulator[n] <= parallelAddResult[n] + accumulator[n];
+			end
+			
+			if (resultDelay == 0) begin
+				busy <= 0;
+				done <= 1;
+			end
 		end
-		
-		if (resultDelay == 0) begin
-			busy <= 0;
-			done <= 1;
+		default: begin
+			done <= 0;
 		end
-	end
-	else if (done == 1) begin
-		done <= 0;
+	endcase
 	end
 end
 
