@@ -23,7 +23,7 @@ module FirFilter
 localparam IN_SAMPLE_WIDTH = 16;
 localparam OUT_SAMPLE_WIDTH = 32;
 localparam WORD_WIDTH = 128;
-localparam RESULT_DELAY = 3;
+localparam RESULT_DELAY = 4;
 localparam BUFF_WIDTH = WORD_WIDTH + IN_SAMPLE_WIDTH * SAMPLES_NUM;
 
 reg [BUFF_WIDTH - 1:0] buffShifter;
@@ -31,9 +31,10 @@ reg [WORD_WIDTH - 1:0] firReg;
 reg [$clog2(WORDS_NUM) - 1:0] rdWordIndex;
 reg [$clog2(WORDS_NUM) - 1:0] wrWordIndex;
 reg signed [33:0] accumulator[SAMPLES_NUM];
-reg [$clog2(RESULT_DELAY) - 1:0] resultDelay;
+reg [$clog2(RESULT_DELAY):0] resultDelay;
 reg buffWren;
 reg busy;
+reg enable;
 reg done;
 reg clear;
 
@@ -58,7 +59,7 @@ assign buffDataStore = buffShifter[BUFF_WIDTH - 1:IN_SAMPLE_WIDTH * SAMPLES_NUM]
 assign doBuffWrite = (clear || wrWordIndex != WORDS_NUM - 1);
 
 FirRam firStorage(
-	.clock(~clkIn),
+	.clock(clkIn),
 	.rdaddress(rdWordIndex),
 	.wraddress(0), // TODO: Add possibility to update fir data
 	.wren(0),
@@ -67,7 +68,7 @@ FirRam firStorage(
 );
 
 BufferRam buffStorage (
-	.clock(~clkIn),
+	.clock(clkIn),
 	.rdaddress(rdWordIndex),
 	.wraddress(wrWordIndex),
 	.wren(buffWren),
@@ -86,9 +87,9 @@ endfunction
 generate
 for (i = 0; i < SAMPLES_NUM; i = i + 1) begin : accumulators_generation
 	MultAdd multAdd1(
-		.clock0(~clkIn),
+		.clock0(clkIn),
 		.aclr3(clear),
-		.ena0(busy),
+		.ena0(enable),
 		.dataa_0(firReg[IN_SAMPLE_WIDTH * 1 - 1:IN_SAMPLE_WIDTH * 0]),
 		.datab_0(buffShifter[IN_SAMPLE_WIDTH * (2 + i) - 1:IN_SAMPLE_WIDTH * (1 + i)]),
 		.dataa_1(firReg[IN_SAMPLE_WIDTH * 2 - 1:IN_SAMPLE_WIDTH * 1]),
@@ -101,9 +102,9 @@ for (i = 0; i < SAMPLES_NUM; i = i + 1) begin : accumulators_generation
 	);
 
 	MultAdd multAdd2(
-		.clock0(~clkIn),
+		.clock0(clkIn),
 		.aclr3(clear),
-		.ena0(busy),
+		.ena0(enable),
 		.dataa_0(firReg[IN_SAMPLE_WIDTH * 5 - 1:IN_SAMPLE_WIDTH * 4]),
 		.datab_0(buffShifter[IN_SAMPLE_WIDTH * (6 + i) - 1:IN_SAMPLE_WIDTH * (5 + i)]),
 		.dataa_1(firReg[IN_SAMPLE_WIDTH * 6 - 1:IN_SAMPLE_WIDTH * 5]),
@@ -117,8 +118,8 @@ for (i = 0; i < SAMPLES_NUM; i = i + 1) begin : accumulators_generation
 
 	ParallelAdd parallelAdd(
 		.aclr(clear),
-		.clken(busy),
-		.clock(~clkIn),
+		.clken(enable),
+		.clock(clkIn),
 		.data0x(multAddResult1[i]),
 		.data1x(multAddResult2[i]),
 		.result(parallelAddResult[i])
@@ -156,20 +157,22 @@ always @(posedge clkIn or negedge nResetIn) begin
 		rdWordIndex <= 0;
 		wrWordIndex <= 0;
 		busy <= 0;
+		enable <= 0;
 		done <= 0;
 		clear <= 0;
 		buffWren <= 0;
 		resultDelay <= 0;
 	end
 	else begin
-	case ({startIn, busy, done})
+	case ({(startIn | clear), (busy & enable), done})
 		3'b100: begin
 			resultDelay <= RESULT_DELAY;
+			enable <= busy;
 			busy <= 1;
 			done <= 0;
 			clear <= 1;
 			buffWren <= 0;
-			rdWordIndex <= 1;
+			rdWordIndex <= rdWordIndex + 1;
 			wrWordIndex <= WORDS_NUM - 1;
 			for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
 				accumulator[n] <= 0;
@@ -177,6 +180,7 @@ always @(posedge clkIn or negedge nResetIn) begin
 		end
 		3'b110, 3'b010: begin
 			busy <= (resultDelay == 0 ? 0 : 1);
+			enable <= (resultDelay == 0 ? 0 : 1);
 			done <= (resultDelay == 0 ? 1 : 0);
 			clear <= 0;
 			firReg <= firWord;
@@ -191,7 +195,9 @@ always @(posedge clkIn or negedge nResetIn) begin
 		end
 		default: begin
 			busy <= 0;
+			enable <= 0;
 			done <= 0;
+			clear <= 0;
 		end
 	endcase
 	end
