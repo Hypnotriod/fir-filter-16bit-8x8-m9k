@@ -163,19 +163,21 @@ always @(posedge clkIn or negedge nResetIn) begin
 	end
 	else begin
 	case ({startIn, busy, done})
-		3'b100, 3'b101: begin
+		3'b100: begin
 			resultDelay <= RESULT_DELAY;
 			busy <= 1;
 			done <= 0;
 			clear <= 1;
 			buffWren <= 0;
+			rdWordIndex <= 1;
+			wrWordIndex <= WORDS_NUM - 1;
 			for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
 				accumulator[n] <= 0;
 			end
-			rdWordIndex <= 1;
-			wrWordIndex <= WORDS_NUM - 1;
 		end
 		3'b110, 3'b010: begin
+			busy <= (resultDelay == 0 ? 0 : 1);
+			done <= (resultDelay == 0 ? 1 : 0);
 			clear <= 0;
 			firReg <= firWord;
 			buffShifter <= clear ? buffDataLoad : buffDataShift;
@@ -183,17 +185,12 @@ always @(posedge clkIn or negedge nResetIn) begin
 			wrWordIndex <= wrWordIndex + doBuffWrite;
 			buffWren <= doBuffWrite;
 			if (!doBuffWrite) resultDelay <= resultDelay - 1;
-			
 			for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
 				accumulator[n] <= parallelAddResult[n] + accumulator[n];
 			end
-			
-			if (resultDelay == 0) begin
-				busy <= 0;
-				done <= 1;
-			end
 		end
 		default: begin
+			busy <= 0;
 			done <= 0;
 		end
 	endcase
