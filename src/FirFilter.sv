@@ -15,6 +15,9 @@ module FirFilter
 	input nResetIn,
 	input startIn,
 	input [IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataIn,
+	input [IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] firIn,
+	input firWriteIn,
+	input firLoadIn,
 	output doneOut,
 	output busyOut,
 	output [OUT_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataOut
@@ -29,13 +32,16 @@ localparam BUFF_WIDTH = WORD_WIDTH + IN_SAMPLE_WIDTH * SAMPLES_NUM;
 reg [BUFF_WIDTH - 1:0] buffShifter;
 reg [WORD_WIDTH - 1:0] firReg;
 reg [$clog2(WORDS_NUM) - 1:0] rdWordIndex;
-reg [$clog2(WORDS_NUM) - 1:0] wrWordIndex;
+reg [$clog2(WORDS_NUM) - 1:0] wrBuffWordIndex;
+reg [$clog2(WORDS_NUM) - 1:0] wrFirWordIndex;
 reg signed [33:0] accumulator[SAMPLES_NUM];
 reg [$clog2(RESULT_DELAY) - 1:0] resultDelay;
 reg buffWren;
 reg busy;
 reg done;
 reg clear;
+reg firLoad;
+reg firWrite;
 
 wire [BUFF_WIDTH - 1:0] buffDataLoad;
 wire [BUFF_WIDTH - 1:0] buffDataShift;
@@ -55,21 +61,21 @@ assign busyOut = busy;
 assign buffDataLoad = {dataIn, buffWord};
 assign buffDataShift = {buffShifter[IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0], buffWord};
 assign buffDataStore = buffShifter[BUFF_WIDTH - 1:IN_SAMPLE_WIDTH * SAMPLES_NUM];
-assign doBuffWrite = (clear || wrWordIndex != WORDS_NUM - 1);
+assign doBuffWrite = (clear || wrBuffWordIndex != WORDS_NUM - 1);
 
 FirRam firStorage(
 	.clock(~clkIn),
 	.rdaddress(rdWordIndex),
-	.wraddress(0), // TODO: Add possibility to update fir data
-	.wren(0),
-	.data(0),
+	.wraddress(wrFirWordIndex),
+	.wren(firWriteIn),
+	.data(firIn),
 	.q(firWord)
 );
 
 BufferRam buffStorage (
 	.clock(~clkIn),
 	.rdaddress(rdWordIndex),
-	.wraddress(wrWordIndex),
+	.wraddress(wrBuffWordIndex),
 	.wren(buffWren),
 	.data(buffDataStore),
 	.q(buffWord)
@@ -150,11 +156,29 @@ endgenerate
 
 always @(posedge clkIn or negedge nResetIn) begin
 	if (!nResetIn) begin
+		firLoad <= 0;
+		firWrite <= 0;
+		wrFirWordIndex <= 0;
+	end
+	else begin
+		firLoad <= firLoadIn;
+		firWrite <= firWriteIn;
+		if (!firLoad && firLoadIn) begin
+			wrFirWordIndex <= 0;
+		end
+		else if (firWrite && !firWriteIn) begin
+			wrFirWordIndex <= wrFirWordIndex + 1;
+		end
+	end
+end
+
+always @(posedge clkIn or negedge nResetIn) begin
+	if (!nResetIn) begin
 		for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
 			accumulator[n] <= 0;
 		end
 		rdWordIndex <= 0;
-		wrWordIndex <= 0;
+		wrBuffWordIndex <= 0;
 		busy <= 0;
 		done <= 0;
 		clear <= 0;
@@ -170,7 +194,7 @@ always @(posedge clkIn or negedge nResetIn) begin
 			clear <= 1;
 			buffWren <= 0;
 			rdWordIndex <= 1;
-			wrWordIndex <= WORDS_NUM - 1;
+			wrBuffWordIndex <= WORDS_NUM - 1;
 			for (n = 0; n < SAMPLES_NUM; n = n + 1) begin
 				accumulator[n] <= 0;
 			end
@@ -182,7 +206,7 @@ always @(posedge clkIn or negedge nResetIn) begin
 			firReg <= firWord;
 			buffShifter <= clear ? buffDataLoad : buffDataShift;
 			rdWordIndex <= rdWordIndex + (rdWordIndex != 0 ? 1 : 0);
-			wrWordIndex <= wrWordIndex + doBuffWrite;
+			wrBuffWordIndex <= wrBuffWordIndex + doBuffWrite;
 			buffWren <= doBuffWrite;
 			if (!doBuffWrite) resultDelay <= resultDelay - 1;
 			for (n = 0; n < SAMPLES_NUM; n = n + 1) begin

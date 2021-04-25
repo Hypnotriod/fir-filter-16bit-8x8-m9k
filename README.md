@@ -13,3 +13,6 @@ Impulse and buffer are stored in `M9K` memory blocks.
 * MOSI -> PIN_M19
 * SCK -> PIN_N20
 * SS -> PIN_N19
+* FIR_DI -> PIN_B22
+* FIR_SCK -> PIN_B21
+* FIR_LOAD -> PIN_C22

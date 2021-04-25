@@ -29,7 +29,10 @@ module Main
 	input ssIn,
 	input mosiIn,
 	input sckIn,
-	output misoOut
+	output misoOut,
+	input firLoadIn,
+	input firDataIn,
+	input firSckIn
 );
 
 localparam BYTE_SIZE = 8;
@@ -41,6 +44,8 @@ reg [BYTE_SIZE * PACKET_SIZE * 2 - 1:0] dataBuff;
 
 wire dataReceived;
 wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataRaw;
+wire firDataReceived;
+wire [IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] firData;
 wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataComputed;
 wire [IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataLoad;
 
@@ -48,6 +53,10 @@ wire clk;
 wire ss;
 wire mosi;
 wire sck;
+
+wire firLoad;
+wire firDI;
+wire firSck;
 
 wire computationComplete;
 
@@ -104,12 +113,16 @@ RXMajority3Filter ssFilter(.clkIn(clk), .nResetIn(nResetIn), .in(ssIn), .out(ss)
 RXMajority3Filter mosiFilter(.clkIn(clk), .nResetIn(nResetIn), .in(mosiIn), .out(mosi));
 RXMajority3Filter sckFilter(.clkIn(clk), .nResetIn(nResetIn), .in(sckIn), .out(sck));
 
+RXMajority3Filter firLoadFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firLoadIn), .out(firLoad));
+RXMajority3Filter firDataFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firDataIn), .out(firDI));
+RXMajority3Filter firSckFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firSckIn), .out(firSck));
+
 Pll100MHz pll100MHz(
 	.inclk0(clkIn),
 	.c0(clk)
 );
 
-SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
+SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) dataSpi(
 	.clkIn(clk),
 	.nResetIn(nResetIn),
 	.ssIn(ss),
@@ -123,11 +136,28 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) spiSlave(
 	.busyOut()
 );
 
+SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) firSpi(
+	.clkIn(clk),
+	.nResetIn(nResetIn),
+	.ssIn(~firLoad),
+	.mosiIn(firData),
+	.sckIn(firSck),
+	.dataIn(0),
+	.dataOut(firData),
+	.dataReceivedOut(firDataReceived),
+	.misoOut(),
+	.emptyOut(),
+	.busyOut()
+);
+
 FirFilter #(.SAMPLES_NUM(SAMPLES_NUM), .WORDS_NUM(WORDS_NUM)) firFilter(
 	.clkIn(clk),
 	.nResetIn(nResetIn),
 	.startIn(dataReceived),
 	.dataIn(dataLoad),
+	.firLoadIn(firLoad),
+	.firWriteIn(firDataReceived),
+	.firIn(firDI),
 	.dataOut(dataComputed),
 	.doneOut(computationComplete),
 	.busyOut()
