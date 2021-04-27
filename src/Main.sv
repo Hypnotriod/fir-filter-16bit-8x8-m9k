@@ -55,7 +55,7 @@ wire mosi;
 wire sck;
 
 wire firLoad;
-wire firDI;
+wire firDi;
 wire firSck;
 
 wire computationComplete;
@@ -114,7 +114,7 @@ RXMajority3Filter mosiFilter(.clkIn(clk), .nResetIn(nResetIn), .in(mosiIn), .out
 RXMajority3Filter sckFilter(.clkIn(clk), .nResetIn(nResetIn), .in(sckIn), .out(sck));
 
 RXMajority3Filter firLoadFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firLoadIn), .out(firLoad));
-RXMajority3Filter firDataFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firDataIn), .out(firDI));
+RXMajority3Filter firDataFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firDataIn), .out(firDi));
 RXMajority3Filter firSckFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firSckIn), .out(firSck));
 
 Pll100MHz pll100MHz(
@@ -140,7 +140,7 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) firSpi(
 	.clkIn(clk),
 	.nResetIn(nResetIn),
 	.ssIn(~firLoad),
-	.mosiIn(firData),
+	.mosiIn(firDi),
 	.sckIn(firSck),
 	.dataIn(0),
 	.dataOut(firData),
@@ -157,7 +157,7 @@ FirFilter #(.SAMPLES_NUM(SAMPLES_NUM), .WORDS_NUM(WORDS_NUM)) firFilter(
 	.dataIn(dataLoad),
 	.firLoadIn(firLoad),
 	.firWriteIn(firDataReceived),
-	.firIn(firDI),
+	.firIn(firData),
 	.dataOut(dataComputed),
 	.doneOut(computationComplete),
 	.busyOut()
