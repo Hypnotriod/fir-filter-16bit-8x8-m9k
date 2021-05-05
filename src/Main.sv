@@ -30,6 +30,7 @@ module Main
 	input mosiIn,
 	input sckIn,
 	output misoOut,
+	output ready,
 	input firLoadIn,
 	input firDataIn,
 	input firSckIn
@@ -39,6 +40,7 @@ localparam BYTE_SIZE = 8;
 localparam IN_SAMPLE_WIDTH = 16;
 localparam OUT_SAMPLE_WIDTH = 32;
 localparam PACKET_SIZE = SAMPLES_NUM * OUT_SAMPLE_WIDTH / BYTE_SIZE;
+localparam FIR_PACKET_SIZE = SAMPLES_NUM * IN_SAMPLE_WIDTH / BYTE_SIZE;
 
 reg [BYTE_SIZE * PACKET_SIZE * 2 - 1:0] dataBuff;
 
@@ -59,6 +61,8 @@ wire firDi;
 wire firSck;
 
 wire computationComplete;
+
+assign ready = 1;
 
 generate
 case (SAMPLES_NUM)
@@ -136,7 +140,7 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) dataSpi(
 	.busyOut()
 );
 
-SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) firSpi(
+SpiSlave #(.PACKET_SIZE(FIR_PACKET_SIZE)) firSpi(
 	.clkIn(clk),
 	.nResetIn(nResetIn),
 	.ssIn(~firLoad),
