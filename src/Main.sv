@@ -30,7 +30,7 @@ module Main
 	input mosiIn,
 	input sckIn,
 	output misoOut,
-	output ready,
+	output nReady,
 	input firLoadIn,
 	input firDataIn,
 	input firSckIn
@@ -62,7 +62,7 @@ wire firSck;
 
 wire computationComplete;
 
-assign ready = 1;
+assign nReady = 0;
 
 generate
 case (SAMPLES_NUM)
