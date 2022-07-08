@@ -81,11 +81,11 @@ BufferRam buffStorage (
 	.q(buffWord)
 );
 
-function [31:0] normalize ([33:0] value);
+function [31:0] saturate ([33:0] value);
 	case ({value[33], value[32], value[31]})
-		3'b100, 3'b101, 3'b110: normalize = 32'h80000000;
-		3'b011, 3'b001, 3'b010: normalize = 32'h7FFFFFFF;
-		default: normalize = value[31:0];
+		3'b100, 3'b101, 3'b110: saturate = 32'h80000000;
+		3'b011, 3'b001, 3'b010: saturate = 32'h7FFFFFFF;
+		default: saturate = value[31:0];
 	endcase
 endfunction
 
@@ -131,26 +131,26 @@ for (i = 0; i < SAMPLES_NUM; i = i + 1) begin : accumulators_generation
 	);
 end 
 case (SAMPLES_NUM)
-	1 : assign dataOut = {normalize(accumulator[0])};
-	2 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1])};
-	3 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
-								 normalize(accumulator[2])};
-	4 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
-								 normalize(accumulator[2]), normalize(accumulator[3])};
-	5 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
-								 normalize(accumulator[2]), normalize(accumulator[3]),
-								 normalize(accumulator[4])};
-	6 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
-								 normalize(accumulator[2]), normalize(accumulator[3]),
-								 normalize(accumulator[4]), normalize(accumulator[5])};
-	7 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
-								 normalize(accumulator[2]), normalize(accumulator[3]),
-								 normalize(accumulator[4]), normalize(accumulator[5]),
-								 normalize(accumulator[6])};
-	8 : assign dataOut = {normalize(accumulator[0]), normalize(accumulator[1]), 
-								 normalize(accumulator[2]), normalize(accumulator[3]),
-								 normalize(accumulator[4]), normalize(accumulator[5]),
-								 normalize(accumulator[6]), normalize(accumulator[7])};
+	1 : assign dataOut = {saturate(accumulator[0])};
+	2 : assign dataOut = {saturate(accumulator[0]), saturate(accumulator[1])};
+	3 : assign dataOut = {saturate(accumulator[0]), saturate(accumulator[1]), 
+								 saturate(accumulator[2])};
+	4 : assign dataOut = {saturate(accumulator[0]), saturate(accumulator[1]), 
+								 saturate(accumulator[2]), saturate(accumulator[3])};
+	5 : assign dataOut = {saturate(accumulator[0]), saturate(accumulator[1]), 
+								 saturate(accumulator[2]), saturate(accumulator[3]),
+								 saturate(accumulator[4])};
+	6 : assign dataOut = {saturate(accumulator[0]), saturate(accumulator[1]), 
+								 saturate(accumulator[2]), saturate(accumulator[3]),
+								 saturate(accumulator[4]), saturate(accumulator[5])};
+	7 : assign dataOut = {saturate(accumulator[0]), saturate(accumulator[1]), 
+								 saturate(accumulator[2]), saturate(accumulator[3]),
+								 saturate(accumulator[4]), saturate(accumulator[5]),
+								 saturate(accumulator[6])};
+	8 : assign dataOut = {saturate(accumulator[0]), saturate(accumulator[1]), 
+								 saturate(accumulator[2]), saturate(accumulator[3]),
+								 saturate(accumulator[4]), saturate(accumulator[5]),
+								 saturate(accumulator[6]), saturate(accumulator[7])};
 endcase
 endgenerate
 

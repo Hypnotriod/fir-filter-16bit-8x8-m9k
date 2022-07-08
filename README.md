@@ -8,7 +8,7 @@ Impulse and buffer are stored in `M9K` memory blocks.
 
 #Pinout
 * CLK -> PIN_T2
-* N_RESET -> PIN_W6
+* N_RESET -> PIN_C21
 * MISO -> PIN_M20
 * MOSI -> PIN_M19
 * SCK -> PIN_N20
@@ -16,4 +16,4 @@ Impulse and buffer are stored in `M9K` memory blocks.
 * FIR_DI -> PIN_B22
 * FIR_SCK -> PIN_B21
 * FIR_LOAD -> PIN_C22
-* READY -> PIN_C21
+* INIT_DONE -> PIN_L22
