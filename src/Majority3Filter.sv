@@ -1,11 +1,11 @@
 
 /*
-* RXMajority3Filter.sv
+* Majority3Filter.sv
 *
 *  Author: Ilya Pikin
 */
 
-module RXMajority3Filter
+module Majority3Filter
 (
 	input clkIn,
 	input nResetIn,

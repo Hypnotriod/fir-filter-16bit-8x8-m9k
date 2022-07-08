@@ -50,6 +50,8 @@ wire [IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] firData;
 wire [BYTE_SIZE * PACKET_SIZE - 1:0] dataComputed;
 wire [IN_SAMPLE_WIDTH * SAMPLES_NUM - 1:0] dataLoad;
 
+wire nReset;
+
 wire clk;
 wire ss;
 wire mosi;
@@ -110,13 +112,15 @@ case (SAMPLES_NUM)
 endcase
 endgenerate
 
-RXMajority3Filter ssFilter(.clkIn(clk), .nResetIn(nResetIn), .in(ssIn), .out(ss));
-RXMajority3Filter mosiFilter(.clkIn(clk), .nResetIn(nResetIn), .in(mosiIn), .out(mosi));
-RXMajority3Filter sckFilter(.clkIn(clk), .nResetIn(nResetIn), .in(sckIn), .out(sck));
+Majority3Filter nResetFilter(.clkIn(clk), .in(nResetIn), .out(nReset));
 
-RXMajority3Filter firLoadFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firLoadIn), .out(firLoad));
-RXMajority3Filter firDataFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firDataIn), .out(firDi));
-RXMajority3Filter firSckFilter(.clkIn(clk), .nResetIn(nResetIn), .in(firSckIn), .out(firSck));
+Majority3Filter ssFilter(.clkIn(clk), .nResetIn(nReset), .in(ssIn), .out(ss));
+Majority3Filter mosiFilter(.clkIn(clk), .nResetIn(nReset), .in(mosiIn), .out(mosi));
+Majority3Filter sckFilter(.clkIn(clk), .nResetIn(nReset), .in(sckIn), .out(sck));
+
+Majority3Filter firLoadFilter(.clkIn(clk), .nResetIn(nReset), .in(firLoadIn), .out(firLoad));
+Majority3Filter firDataFilter(.clkIn(clk), .nResetIn(nReset), .in(firDataIn), .out(firDi));
+Majority3Filter firSckFilter(.clkIn(clk), .nResetIn(nReset), .in(firSckIn), .out(firSck));
 
 Pll100MHz pll100MHz(
 	.inclk0(clkIn),
@@ -125,7 +129,7 @@ Pll100MHz pll100MHz(
 
 SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) dataSpi(
 	.clkIn(clk),
-	.nResetIn(nResetIn),
+	.nResetIn(nReset),
 	.ssIn(ss),
 	.mosiIn(mosi),
 	.sckIn(sck),
@@ -139,7 +143,7 @@ SpiSlave #(.PACKET_SIZE(PACKET_SIZE)) dataSpi(
 
 SpiSlave #(.PACKET_SIZE(FIR_PACKET_SIZE)) firSpi(
 	.clkIn(clk),
-	.nResetIn(nResetIn),
+	.nResetIn(nReset),
 	.ssIn(~firLoad),
 	.mosiIn(firDi),
 	.sckIn(firSck),
@@ -153,7 +157,7 @@ SpiSlave #(.PACKET_SIZE(FIR_PACKET_SIZE)) firSpi(
 
 FirFilter #(.SAMPLES_NUM(SAMPLES_NUM), .WORDS_NUM(WORDS_NUM)) firFilter(
 	.clkIn(clk),
-	.nResetIn(nResetIn),
+	.nResetIn(nReset),
 	.startIn(dataReceived),
 	.dataIn(dataLoad),
 	.firLoadIn(firLoad),
@@ -164,8 +168,8 @@ FirFilter #(.SAMPLES_NUM(SAMPLES_NUM), .WORDS_NUM(WORDS_NUM)) firFilter(
 	.busyOut()
 );
 
-always @(posedge clk or negedge nResetIn) begin
-	if (!nResetIn) begin
+always @(posedge clk or negedge nReset) begin
+	if (!nReset) begin
 		dataBuff <= 0;
 	end
 	else begin
